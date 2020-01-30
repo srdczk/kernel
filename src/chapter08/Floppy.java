@@ -80,10 +80,12 @@ public class Floppy {
     }
 
     private void writeFromFile(String fileName, MAGNETIC_HEAD head, int c, int s) {
-        byte[] bytes = readFloppy(head, c, s);
+        byte[] bytes = new byte[SECTOR_SIZE];
         try (FileInputStream inputStream = new FileInputStream(fileName)) {
-            int k, cnt = 0;
-            while ((k = inputStream.read()) != -1) bytes[cnt++] = (byte) k;
+            while (inputStream.read(bytes) > 0) {
+                writeToFloppy(head, c, s++, bytes);
+                bytes = new byte[SECTOR_SIZE];
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
